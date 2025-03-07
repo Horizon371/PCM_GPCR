@@ -1,0 +1,1 @@
+DATA_FOLDER = "/data/projects/cristian/"
