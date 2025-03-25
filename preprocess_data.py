@@ -4,7 +4,6 @@ from rdkit.Chem import AllChem
 import numpy as np
 from rdkit.Chem.SaltRemover import SaltRemover
 from rdkit.Chem import rdFingerprintGenerator
-import constants
 
 AA_ALPHABET = "ACDEFGHIKLMNPQRSTVWY"
 
@@ -41,7 +40,8 @@ def calculate_fingerprint(mol: Chem.Mol):
     else:
         return None  # In case of invalid SMILES
 
-def preprocess_bioactivity_data(bioactivities_csv):
+
+def preprocess_bioactivity_data(bioactivities_csv, processed_data_path):
 
     activities = pl.read_csv(bioactivities_csv).select(["canonical_smiles", "sequence", "standard_value"])
 
@@ -50,10 +50,10 @@ def preprocess_bioactivity_data(bioactivities_csv):
         pl.col(["sequence"]).map_elements(one_hot_encoding).alias("encoding")
     ])
 
-    print(activities)
-
     activities = activities.filter(
         ~pl.col("canonical_smiles").is_in(["", None]) | ~pl.col("fingerprint").is_null()
     )
 
-    activities.write_parquet(f"{constants.DATA_FOLDER}/chembl_gpcr.parquet")
+    activities = activities.drop_nans()
+
+    activities.write_parquet(processed_data_path)
