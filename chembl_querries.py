@@ -6,6 +6,7 @@ SELECT DISTINCT
     cse.accession AS uniprot_id,
     cse.sequence,
     act.pchembl_value,
+    act.standard_type,
     act.standard_value
 FROM target_dictionary td
   JOIN assays a ON td.tid = a.tid
@@ -29,5 +30,5 @@ FROM target_dictionary td
     AND cse.organism = "Homo sapiens"
     AND cp.heavy_atoms <= 50
     AND act.standard_units = 'nM'
-    AND act.standard_type = "IC50"
+    AND act.standard_type IN ("IC50", "EC50", "Ki", "Kd")
 """
